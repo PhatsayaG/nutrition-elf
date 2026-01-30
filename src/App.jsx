@@ -15,16 +15,45 @@ function App() {
   const analyzeImages = async () => {
     setLoading(true);
     try {
-      // 這裡的 /api/analyze 會自動對應到你寫的那個 api/analyze.js 檔案
+      // --- 新增：自動縮圖邏輯 ---
+      const compressImage = async (base64Str) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = base64Str;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1200; // 縮小到寬度 1200px 即可，AI 看得清楚
+            let width = img.width;
+            let height = img.height;
+
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.7)); // 壓縮品質設為 0.7
+          };
+        });
+      };
+
+      // 對所有上傳的圖片進行壓縮
+      const compressedImages = await Promise.all(images.map(img => compressImage(img)));
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images }),
+        body: JSON.stringify({ images: compressedImages }), // 傳送縮小的圖片
       });
+      
       const data = await response.json();
+      if (data.error) throw new Error(data.error);
       setResult(data);
     } catch (err) {
-      alert("分析失敗，請稍後再試。");
+      console.error("錯誤細節:", err);
+      alert(`分析失敗：${err.message || "伺服器超載"}`);
     } finally {
       setLoading(false);
     }
