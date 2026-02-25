@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { model } from '@/api/geminiConfig';
+import { model } from '@/api/geminiConfig.js';
 import { Button } from "@/components/ui/button";
 import { Sparkles, RotateCcw } from 'lucide-react';
 import { toast } from "sonner"; // 2. 引入通知組件

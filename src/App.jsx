@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
-import { model } from '@/api/geminiConfig';
+import { model } from '@/api/geminiConfig.js';
 import { Toaster } from "@/components/ui/sonner"; // 留這一個就好
 import Home from '@/pages/Home';
 import { Button } from "@/components/ui/button";
