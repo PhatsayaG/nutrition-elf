@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
-import { model } from './api/geminiConfig'; // 點號代表當前資料夾
-import { toast } from "sonner";
+import { model } from '@/api/geminiConfig';  // 使用 @，Vite 就會去 src/api 找
+import { Toaster } from "@/components/ui/sonner";
+import Home from '@/pages/Home';
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RotateCcw, LayoutDashboard, MessageSquare } from 'lucide-react';
