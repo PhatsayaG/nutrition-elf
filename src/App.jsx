@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
-import { model } from '@/api/geminiConfig'; // 引用你的資安設定檔
+import { model } from './api/geminiConfig'; // 點號代表當前資料夾
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { model } from '@/api/geminiConfig'; // 1. 改為引用您原本的 Gemini 設定
+import { model } from '../api/geminiConfig'; // 兩點代表上一層資料夾
 import { Button } from "@/components/ui/button";
 import { Sparkles, RotateCcw } from 'lucide-react';
 import { toast } from "sonner"; // 2. 引入通知組件
