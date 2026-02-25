@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas';
 import { model } from '@/api/geminiConfig.js';
 import { Toaster } from "@/components/ui/sonner.jsx";
 import Home from '@/pages/Home.jsx';
-import { Button } from "@/components/ui/button.jsx";
+import { Button } from "@/components/ui/Button.jsx";
 import { Sparkles, Download, RotateCcw, LayoutDashboard, MessageSquare } from 'lucide-react';
 import ImageUploader from './components/nutrition/ImageUploader';
 import LoadingAnimation from './components/nutrition/LoadingAnimation';
