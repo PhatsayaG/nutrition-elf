@@ -1,9 +1,8 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
-import { model } from '@/api/geminiConfig';  // 使用 @，Vite 就會去 src/api 找
-import { Toaster } from "@/components/ui/sonner";
+import { model } from '@/api/geminiConfig';
+import { Toaster } from "@/components/ui/sonner"; // 留這一個就好
 import Home from '@/pages/Home';
-import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RotateCcw, LayoutDashboard, MessageSquare } from 'lucide-react';
 import ImageUploader from './components/nutrition/ImageUploader';
