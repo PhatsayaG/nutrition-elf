@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { model } from '@/api/geminiConfig.js';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button.jsx"
 import { Sparkles, RotateCcw } from 'lucide-react';
 import { toast } from "sonner"; // 2. 引入通知組件
 import ImageUploader from '@/components/nutrition/ImageUploader';
