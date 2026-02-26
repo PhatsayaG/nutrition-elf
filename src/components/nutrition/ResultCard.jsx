@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/Button.jsx";
+import { Badge } from "@/components/ui/Badge.jsx";
 import { Share2, Download, Sparkles, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { toast } from "sonner";

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button.jsx"; 
 import { Camera, ImagePlus, X } from 'lucide-react';
 
 export default function ImageUploader({ images, setImages, disabled }) {
