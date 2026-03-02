@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { model } from '@/api/geminiConfig.js';
-import { Button } from "@/components/ui/Button.jsx"
+import { model } from '@/api/geminiConfig.js'; 
+import { Button } from "@/components/ui/Button.jsx";
 import { Sparkles, RotateCcw } from 'lucide-react';
-import { toast } from "sonner"; // 2. 引入通知組件
-import ImageUploader from '@/components/nutrition/ImageUploader';
-import LoadingAnimation from '@/components/nutrition/LoadingAnimation';
-import ResultCard from '@/components/nutrition/ResultCard';
+import { toast } from "sonner";
+import ImageUploader from '@/components/nutrition/ImageUploader.jsx';
+import LoadingAnimation from '@/components/nutrition/LoadingAnimation.jsx';
+import ResultCard from '@/components/nutrition/ResultCard.jsx';
 
 export default function Home() {
   const [images, setImages] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
 
-  // 3. 輔助函式：將圖片檔案轉換為 Gemini API 格式
+  // 轉換圖片為 Base64
   const fileToGenerativePart = async (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -24,8 +24,11 @@ export default function Home() {
   };
 
   const handleAnalyze = async () => {
+    // 偵錯第一步：確認函式有沒有被觸發
+    console.log("Button Clicked: Start Analysis"); 
+    
     if (images.length === 0) {
-      toast.error("請先上傳圖片");
+      toast.error("請上傳食品照片");
       return;
     }
 
@@ -33,115 +36,119 @@ export default function Home() {
     setResult(null);
 
     try {
-      // 4. 準備圖片數據 (取代 Base44 的 UploadFile)
+      console.log("Step 1: Processing images...");
       const imageParts = await Promise.all(
         images.map(img => fileToGenerativePart(img.file))
       );
 
-      // 5. 調用您自己的 Gemini 模型 (保留原本精美的 Prompt)
-      const prompt = `你是「營養小精靈」，一位風格幽默但專業的營養師。
-請分析這些食品營養標示圖片，並提供以下資訊：
+      console.log("Step 2: Calling Gemini API...");
+      const prompt = `你是營養小精靈，請分析圖片並回傳 JSON。`;
 
-任務：
-1. 辨識營養成分（熱量、脂肪、碳水化合物、糖、鈉等）
-2. 識別食品添加物
-3. 綜合判斷食品屬性（優質營養 vs. 熱量陷阱）
-
-風格要求：
-- 用通俗易懂的白話文
-- 帶點幽默感，但不說教
-- 針對一般大眾能秒懂的資訊
-
-請直接輸出 JSON，不要有任何其他文字或 markdown 格式。`;
+      // 偵錯第二步：確認 model 是否存在
+      if (!model) throw new Error("Gemini Model is not initialized. Check your config.");
 
       const aiResult = await model.generateContent([prompt, ...imageParts]);
       const response = await aiResult.response;
       const text = response.text();
       
-      // 6. 清理並解析 JSON 數據
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      const parsedResult = JSON.parse(cleanJson);
-      
-      setResult(parsedResult);
-      toast.success("小精靈辨識成功！");
+      console.log("Step 3: AI Raw Response:", text);
 
-      // 7. 移除原本的 AnalysisRecord.create (因為這是 Base44 的資料庫功能)
-      // 若您未來需要存檔，可以改寫為串接您的 Firebase 或本地 LocalStorage
+      const cleanJson = text.replace(/```json|```/g, "").trim();
+      setResult(JSON.parse(cleanJson));
+      toast.success("分析成功！🧚");
 
     } catch (error) {
-      console.error('分析失敗:', error);
-      toast.error("辨識過程出錯，請檢查 API Key 或圖片清晰度");
+      // 這是最重要的除錯資訊
+      console.error('CRITICAL ERROR:', error); 
+      toast.error(`分析出錯: ${error.message}`);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const handleReset = () => {
-    setImages([]);
-    setResult(null);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
-      <div className="max-w-lg mx-auto min-h-screen md:min-h-0 md:py-8">
-        <div className="bg-white md:rounded-3xl md:shadow-xl min-h-screen md:min-h-0 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-8 text-white text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-3xl">🧚</span>
-              <h1 className="text-2xl font-bold">營養小精靈</h1>
-            </div>
-            <p className="text-emerald-100 text-sm">拍一拍，秒懂食品真相</p>
+    // 全平台 RWD 容器：電腦版背景淡灰色，手機版滿版
+    <div className="min-h-screen bg-slate-100 sm:py-10 flex justify-center items-start">
+      
+      {/* 主要容器：電腦版限制寬度並置中，手機版 w-full */}
+      <div className="w-full max-w-2xl bg-white min-h-screen sm:min-h-0 sm:rounded-3xl sm:shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
+        
+        {/* Header - 針對電腦版增加高度感 */}
+        <header className="bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-12 text-white text-center shadow-inner">
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <span className="text-5xl drop-shadow-md">🧚</span>
+            <h1 className="text-3xl font-black tracking-tighter">營養小精靈</h1>
           </div>
+          <p className="text-emerald-50 font-medium opacity-90">專為數位游牧者設計的健康顧問</p>
+        </header>
 
-          {/* 內容區 */}
-          <div className="p-6 space-y-6">
-            {!result ? (
-              <>
+        {/* 內容區 - 電腦版增加內距 (p-10), 手機版維持 (p-6) */}
+        <main className="p-6 sm:p-10 space-y-8 flex-1">
+          {!result ? (
+            <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+              
+              {/* 上傳區：在電腦版會自動撐開 */}
+              <div className="bg-white rounded-2xl">
                 <ImageUploader
                   images={images}
                   setImages={setImages}
                   disabled={isAnalyzing}
                 />
+              </div>
 
-                {isAnalyzing && <LoadingAnimation />}
+              {isAnalyzing && (
+                <div className="flex flex-col items-center py-12">
+                  <LoadingAnimation />
+                  <p className="text-emerald-600 font-bold mt-6 animate-pulse text-lg">正在讀取營養標示...</p>
+                </div>
+              )}
 
-                {!isAnalyzing && images.length > 0 && (
-                  <Button
-                    onClick={handleAnalyze}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-6 rounded-2xl text-lg font-semibold shadow-lg"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    開始分析
-                  </Button>
-                )}
-
-                {!isAnalyzing && images.length === 0 && (
-                  <div className="bg-emerald-50 rounded-2xl p-4 space-y-2">
-                    <h3 className="font-semibold text-emerald-700">📸 使用小提示</h3>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• 拍攝包裝正面可辨識產品名稱</li>
-                      <li>• 拍攝營養標示表可獲得完整分析</li>
-                      <li>• 成分表可幫助識別添加物</li>
-                    </ul>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <ResultCard result={result} />
+              {!isAnalyzing && images.length > 0 && (
                 <Button
-                  onClick={handleReset}
-                  variant="outline"
-                  className="w-full border-emerald-300 text-emerald-600 hover:bg-emerald-50 py-4 rounded-2xl"
+                  onClick={handleAnalyze}
+                  className="w-full h-20 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-2xl font-black shadow-xl hover:shadow-emerald-200 transition-all active:scale-95"
                 >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  分析其他食品
+                  <Sparkles className="w-7 h-7 mr-3" />
+                  開始分析
                 </Button>
-              </>
-            )}
-          </div>
-        </div>
+              )}
+
+              {/* 指南區：電腦版雙欄顯示，手機版單欄 */}
+              {!isAnalyzing && images.length === 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                    <p className="text-emerald-800 font-bold text-sm">📸 拍照要領</p>
+                    <p className="text-emerald-700/70 text-xs mt-1">光線充足、對焦清晰、正對文字</p>
+                  </div>
+                  <div className="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                    <p className="text-teal-800 font-bold text-sm">🥗 分析重點</p>
+                    <p className="text-teal-700/70 text-xs mt-1">熱量、添加物、升糖指數評估</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="animate-in slide-in-from-right-8 duration-500">
+              {/* 結果顯示：在電腦版會更寬敞 */}
+              <ResultCard result={result} />
+              
+              <Button
+                onClick={() => { setImages([]); setResult(null); }}
+                variant="outline"
+                className="w-full mt-8 border-slate-200 text-slate-400 py-6 rounded-2xl font-bold hover:bg-slate-50 transition-colors"
+              >
+                <RotateCcw className="w-5 h-5 mr-2" />
+                重新開始
+              </Button>
+            </div>
+          )}
+        </main>
+
+        <footer className="py-8 text-center border-t border-slate-50">
+          <p className="text-[11px] text-slate-300 font-bold uppercase tracking-[0.2em]">
+            Nutrition Elf • Built for Global Citizens
+          </p>
+        </footer>
       </div>
     </div>
   );
